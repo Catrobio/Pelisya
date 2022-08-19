@@ -15,6 +15,6 @@ namespace Business.DTOs
         public string Email { get; set; }         
         public DateTime FechaNacimiento { get; set; }
         public DateTime FechaAlta { get; set; }        
-        public  List<FacturasporcobrarDTO> Facturasporcobrar { get; set; }
+        public  List<FacturasporcobrarDTO> ListaFacturas { get; set; }
     }
 }

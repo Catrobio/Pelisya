@@ -1,0 +1,4 @@
+{
+  "ConnectionStringDesarrollo": "server=localhost;database=pelisya;uid=root;pwd=123456",
+  "ConnectionStringProduccion": "server=localhost;database=pelisya;uid=root;pwd=123456"
+}

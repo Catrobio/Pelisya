@@ -1,16 +1,35 @@
 ﻿using Business.DTOs;
 using EntityLib;
 using Microsoft.EntityFrameworkCore;
+using AutoMapper;
 
-namespace Business.Usuarios
+namespace Business.UsuariosBusinnes
 {
-    public class UsuariosBusiness
+    public interface IUsuariosBusiness
+    {
+        List<UsuariosDTO> GetUsuarios();
+        UsuariosDTO GetUsuarioById(int IdUsuario);        
+    }
+    public class UsuariosBusiness : IUsuariosBusiness
     {
         private pelisyaContext _context;
+        private IMapper _mapper;   
         public UsuariosBusiness()
         {
             //Instanciamos el context en el constructor
             _context = new pelisyaContext();
+            
+            var config = new MapperConfiguration(cfg =>
+            {
+                cfg.CreateMap<Usuarios, UsuariosDTO>()
+                .ForMember(
+                        dto => dto.ListaFacturas,
+                        enty => enty.MapFrom(p => p.Facturasporcobrar)
+                    )
+                .ReverseMap();
+                cfg.CreateMap<Facturasporcobrar, FacturasporcobrarDTO>().ReverseMap();
+            });
+            _mapper = config.CreateMapper();            
         }
 
         public List<UsuariosDTO> GetUsuarios()
@@ -23,8 +42,10 @@ namespace Business.Usuarios
                 .Include(u => u.Facturasporcobrar)
                 .ToList();
 
+            result = _mapper.Map<List<UsuariosDTO>>(usuariosYFacturas);
+
             //Iteramos el resultado para asignar cada valor que devuelve y agregarlo dentro de la lista DTO
-            foreach (var usuarios in usuariosYFacturas)
+            /*foreach (var usuarios in usuariosYFacturas)
             {
                 var usuariosDTO = new UsuariosDTO
                 {
@@ -62,9 +83,23 @@ namespace Business.Usuarios
                 //Agregamos UsuariosDTO a la lista resultado
                 result.Add(usuariosDTO);
                 //Este ciclo se repite por cada usuario
-            }
+            }*/
 
             return result;
         }
-    }
+        public UsuariosDTO GetUsuarioById(int idUsuario)
+        {
+            var result = new UsuariosDTO();
+
+            var usuario = _context.Usuarios
+                .Include(f => f.Facturasporcobrar)
+                .Where(u => u.IdUsuario == idUsuario)
+                .FirstOrDefault();
+
+            result = _mapper.Map<UsuariosDTO>(usuario);         
+            
+            return result;
+        }
+        
+    }   
 }

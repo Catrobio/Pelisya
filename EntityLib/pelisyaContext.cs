@@ -2,6 +2,8 @@
 using System.Collections.Generic;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.Extensions.Configuration;
+using System.IO;
 
 namespace EntityLib
 {
@@ -30,7 +32,16 @@ namespace EntityLib
         {
             if (!optionsBuilder.IsConfigured)
             {
-                optionsBuilder.UseMySql("server=localhost;database=pelisya;uid=root;pwd=123456", Microsoft.EntityFrameworkCore.ServerVersion.Parse("8.0.28-mysql"));
+                //Buscamos el archivo .json
+                var _config = new ConfigurationBuilder()
+                    .SetBasePath(Directory.GetCurrentDirectory())
+                    .AddJsonFile("settings.json", optional: true, reloadOnChange: true);
+
+                //usamos la conectionstring que esta guardada en el avariable ConnectionStringDesarrollo
+                IConfiguration configuration = _config.Build();
+                optionsBuilder.UseMySql(
+                    configuration["ConnectionStringDesarrollo"], new MySqlServerVersion(new Version(8, 0, 23))
+                );
             }
         }
 

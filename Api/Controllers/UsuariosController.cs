@@ -1,5 +1,5 @@
 ﻿using Microsoft.AspNetCore.Mvc;
-using Business.Usuarios;
+using Business.UsuariosBusinnes;
 using Business.DTOs;
 
 namespace Api.Controllers
@@ -9,16 +9,22 @@ namespace Api.Controllers
     [ApiController]
     public class UsuariosController : Controller
     {
-        private UsuariosBusiness usuariosBusiness;
-        public UsuariosController()
+        private IUsuariosBusiness _usuariosBusiness;
+        public UsuariosController(IUsuariosBusiness usuariosBusiness)
         {
-            usuariosBusiness = new UsuariosBusiness();
+            _usuariosBusiness = usuariosBusiness;
         }
 
         [HttpGet("Lista")]
         public List<UsuariosDTO> ListaUsuarios()
         {
-           return usuariosBusiness.GetUsuarios();
+           return _usuariosBusiness.GetUsuarios();
+        }
+
+        [HttpGet("{idUsuario}")]
+        public UsuariosDTO GetUsuarioById(int idUsuario)
+        {
+            return _usuariosBusiness.GetUsuarioById(idUsuario);
         }
     }
 }

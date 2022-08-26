@@ -20,6 +20,24 @@ namespace Api.Controllers
         {
             return await _userAccoutBusiness.Authentication(userAccount);
         }
-      
+
+        [HttpPost("Create")]
+        public async Task<UserAccountDTO> CreateUser(UserAccountDTO usuario)
+        {
+            return await _userAccoutBusiness.CreateUsuarios(usuario);
+        }
+
+        [HttpPut("Update")]
+        public UserAccountDTO UpdateUser(UserAccountDTO usuario)
+        {
+            return  _userAccoutBusiness.UpdateUsuario(usuario);
+        }
+
+        [HttpPost("hash")]
+        public bool LoginUser()
+        {
+            return _userAccoutBusiness.HashPassword();
+        }
+
     }
 }

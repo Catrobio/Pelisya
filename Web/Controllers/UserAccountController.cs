@@ -1,5 +1,6 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using Web.Models;
+using Web.Helpers;
 
 namespace Web.Controllers
 {
@@ -7,16 +8,32 @@ namespace Web.Controllers
     {
         HttpRequestMessage _httpRequest;
         HttpClient _httpClient;
+        private SessionsHelpers _session;
+        private LocalStorageHelpers _loaclStorage;
 
-        public UserAccountController()
+        public UserAccountController(SessionsHelpers sessions, LocalStorageHelpers loaclStorage)
         {
             _httpRequest = new HttpRequestMessage();
             _httpClient = new HttpClient();
+            _session = sessions;
+            _loaclStorage = loaclStorage;
         }
         public IActionResult Login()
         {
+            if (_session.IsSessionActive("usuarioActivo"))
+            {
+                return RedirectToAction("Index", "Home");
+            }
+
             var userAccount = new UserAccountModel();
             return View(userAccount);
+        }
+
+        public IActionResult Logout()
+        {
+            _session.ClearSession();
+            return RedirectToAction("Login", "Useraccount");
+
         }
 
         [HttpPost]
@@ -40,12 +57,12 @@ namespace Web.Controllers
                 userAccount.Error = userAccountResult.Error;
                 return View(userAccount);                
             }
-            else 
-            {
-                return RedirectToAction("Index", "Usuarios");
-            }
 
-            
+            _session.SetSession("usuarioActivo", userAccountResult.UserName);
+
+            //await _loaclStorage.SetValue("UserName", userAccountResult.UserName);
+
+            return RedirectToAction("Index", "Usuarios");                        
         }
     }
 }

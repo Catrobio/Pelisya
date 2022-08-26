@@ -1,6 +1,7 @@
 ﻿using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Web.Models;
+using Web.Helpers;
 
 namespace Web.Controllers
 {
@@ -8,17 +9,23 @@ namespace Web.Controllers
     {
         HttpRequestMessage _httpRequest;
         HttpClient _httpClient;
-        public UsuariosController()
+        private SessionsHelpers _session;
+        public UsuariosController(SessionsHelpers sessions)
         {
             _httpRequest = new HttpRequestMessage();
             _httpClient = new HttpClient();
+            _session = sessions;
         }
 
         // GET: UsuariosController
         public async Task<ActionResult> Index()
         {
-            var listUsuariosModel = new List<UsuariosModel>();
+            if (!_session.IsSessionActive("usuarioActivo"))
+            {
+                return RedirectToAction("Login", "UserAccount");
+            }
 
+            var listUsuariosModel = new List<UsuariosModel>();
             _httpRequest.Method = new HttpMethod("GET");
             _httpRequest.RequestUri = new Uri("http://localhost:5002/api/Usuarios/Lista");
             var response = _httpClient.Send(_httpRequest);

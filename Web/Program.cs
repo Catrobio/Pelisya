@@ -1,4 +1,20 @@
+using Web.Helpers;
+
 var builder = WebApplication.CreateBuilder(args);
+
+//Configrar la sesion
+builder.Services.AddSession(options => 
+    {
+        options.Cookie.Name = ".pelisya.session";
+        options.IdleTimeout = TimeSpan.FromMinutes(30);
+        options.Cookie.IsEssential = true;
+    }    
+);
+
+//Inyeccion de dependencia
+builder.Services.AddHttpContextAccessor();
+builder.Services.AddSingleton<SessionsHelpers>();
+builder.Services.AddScoped<LocalStorageHelpers>();
 
 // Add services to the container.
 builder.Services.AddControllersWithViews();
@@ -11,6 +27,8 @@ if (!app.Environment.IsDevelopment())
     app.UseExceptionHandler("/Home/Error");
 }
 app.UseStaticFiles();
+//Usar las sesiones
+app.UseSession();
 
 app.UseRouting();
 

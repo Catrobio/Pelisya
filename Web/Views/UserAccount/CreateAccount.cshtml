@@ -1,0 +1,84 @@
+﻿@model Web.Models.UserAccountModel
+
+@{
+    ViewData["Title"] = "CreateAccount";
+}
+
+<h1>CreateAccount</h1>
+
+<h4>UserAccountModel</h4>
+<hr />
+<div class="row">
+    <div class="col-md-4">
+        <form method="POST" asp-action="CreateAccount">
+            <div asp-validation-summary="ModelOnly" class="text-danger"></div>            
+            <div class="form-group">
+                <label asp-for="UserName" class="control-label"></label>
+                <input asp-for="UserName" class="form-control" />
+                <span asp-validation-for="UserName" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="Password" class="control-label"></label>
+                <input type="password" asp-for="Password" class="form-control" />
+                <span asp-validation-for="Password" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+
+                <select name="IdCategoria" id="IdCategoria">
+
+                </select>
+
+            </div>
+            <div class="form-group">
+                <label asp-for="Nombre" class="control-label"></label>
+                <input asp-for="Nombre" class="form-control" />
+                <span asp-validation-for="Nombre" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="Apellido" class="control-label"></label>
+                <input asp-for="Apellido" class="form-control" />
+                <span asp-validation-for="Apellido" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="FechaNacimiento" class="control-label"></label>
+                <input asp-for="FechaNacimiento" class="form-control" />
+                <span asp-validation-for="FechaNacimiento" class="text-danger"></span>
+            </div>   
+           
+            <div class="form-group">
+                <input type="submit" value="Create" class="btn btn-primary" />
+            </div>
+        </form>
+         <h2> @Model.Message </h2>
+    </div>
+</div>
+
+<div>
+    <a asp-action="Index">Back to List</a>
+</div>
+<script src="~/lib/jquery/jquery.min.js"></script>
+<script>
+    let errorCod = @Model.ErrorCode;
+    if (errorCod != 0) {
+        alert('@Model.Message');
+    }
+    $.ajax({
+        type:"GET",
+        url: "http://localhost:5002/api/Categorias/Todas",
+        contentType: "application/json; charset=utf-8",
+        dataType: "json",
+        success: function(data) {
+            let select = $("#IdCategoria");
+            let op = "";
+            $.each(data, function(i, obj) {
+                op += "<option value='" + obj.idCategoria + "'>" + obj.descripcion + "</option>";
+            });
+            select.html(op);
+        }
+
+    })
+</script>
+
+@section Scripts {
+    @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
+}

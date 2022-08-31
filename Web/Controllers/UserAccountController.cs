@@ -29,6 +29,14 @@ namespace Web.Controllers
             return View(userAccount);
         }
 
+        public IActionResult CreateAccount()
+        {
+            var userAccount = new UserAccountModel();
+
+            return View(userAccount);
+        }
+
+
         public IActionResult Logout()
         {
             _session.ClearSession();
@@ -37,12 +45,32 @@ namespace Web.Controllers
         }
 
         [HttpPost]
+        public async Task<IActionResult> CreateAccount(UserAccountModel userAccount)
+        {
+            //userAccount.IdUsuario = 0;
+            _httpRequest.Method = new HttpMethod("POST");
+            _httpRequest.RequestUri = new Uri("http://localhost:5002/api/UserAccount/Create");
+            _httpRequest.Content = JsonContent.Create(userAccount);
+
+            var response = await _httpClient.SendAsync(_httpRequest);
+
+            var userAccountResult = await response.Content.ReadFromJsonAsync<UserAccountModel>();
+
+            if (userAccountResult.ErrorCode != null)
+            {
+                userAccount.Error = userAccountResult.Error;
+                return View(userAccount);
+            }
+            return RedirectToAction("Login", "Useraccount");
+        }
+
+        [HttpPost]
         public async Task<IActionResult> Login(string userName, string password)
         {
-            var userAccount = new UserAccountModel();
+            var userAccount = new LoginModel();
 
             userAccount.UserName = userName;
-            userAccount.Password = password;    
+            userAccount.Password = password;            
 
             _httpRequest.Method = new HttpMethod("POST");
             _httpRequest.RequestUri = new Uri("http://localhost:5002/api/UserAccount/Login");
@@ -54,7 +82,7 @@ namespace Web.Controllers
 
             if(userAccountResult.Error != null)
             {
-                userAccount.Error = userAccountResult.Error;
+                userAccount.Message = userAccountResult.Error;
                 return View(userAccount);                
             }
 

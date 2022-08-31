@@ -16,9 +16,9 @@ namespace Api.Controllers
         }
 
         [HttpPost("Login")]
-        public async Task<UserAccountDTO> LoginUser(UserAccountDTO userAccount)
+        public async Task<UserAccountDTO> LoginUser(LoginDTO userLogin)
         {
-            return await _userAccoutBusiness.Authentication(userAccount);
+            return await _userAccoutBusiness.Authentication(userLogin);
         }
 
         [HttpPost("Create")]
@@ -31,6 +31,12 @@ namespace Api.Controllers
         public UserAccountDTO UpdateUser(UserAccountDTO usuario)
         {
             return  _userAccoutBusiness.UpdateUsuario(usuario);
+        }
+
+        [HttpDelete("Delete")]
+        public async Task<bool> DeleteUser(int idUsuario)
+        {
+            return await _userAccoutBusiness.DeleteUsuario(idUsuario);
         }
 
         [HttpPost("hash")]

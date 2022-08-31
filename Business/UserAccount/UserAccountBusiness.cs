@@ -11,9 +11,10 @@ namespace Business.UserAccountBusiness
 {
     public interface IUserAccountBusiness
     {
-        Task<UserAccountDTO> Authentication(UserAccountDTO userAccount);
+        Task<UserAccountDTO> Authentication(LoginDTO userLogin);
         Task<UserAccountDTO> CreateUsuarios(UserAccountDTO usuario);
         UserAccountDTO UpdateUsuario(UserAccountDTO user);
+        Task<bool> DeleteUsuario(int idUsuario);
         bool HashPassword();
     }
     public class UserAccountBusiness : IUserAccountBusiness
@@ -37,31 +38,31 @@ namespace Business.UserAccountBusiness
             _mapper = config.CreateMapper();
         }
 
-        public async Task<UserAccountDTO> Authentication(UserAccountDTO userAccount)
+        public async Task<UserAccountDTO> Authentication(LoginDTO userLogin)
         {
             var result = new UserAccountDTO();
 
-            if (string.IsNullOrEmpty(userAccount.UserName) || string.IsNullOrEmpty(userAccount.Password))
+            if (string.IsNullOrEmpty(userLogin.UserName) || string.IsNullOrEmpty(userLogin.Password))
             {
-                result.Error = "Usuario y contraseña no puede ser vacio";
+                result.Message = "Usuario y contraseña no puede ser vacio";
             }
             else
             {
                 var usuario = await _context.Usuarios
                     .Where(u =>
-                        u.Email == userAccount.UserName
+                        u.Email == userLogin.UserName
                         ).FirstOrDefaultAsync();
 
 
                 if (usuario == null)
                 {
-                    result.Error = "Usuario no existe";
+                    result.Message = "Usuario no existe";
                 }
                 else
                 {
                     
 
-                    if (VerifyHash(userAccount.Password, usuario.Password))
+                    if (VerifyHash(userLogin.Password, usuario.Password))
                     {
                         result = _mapper.Map<UserAccountDTO>(usuario);
 
@@ -73,7 +74,7 @@ namespace Business.UserAccountBusiness
                     }
                     else
                     {
-                        result.Error = "Usuario o contraseña incorrecta";
+                        result.Message = "Usuario o contraseña incorrecta";
                     }
                 }
             }
@@ -95,7 +96,7 @@ namespace Business.UserAccountBusiness
                 result.Message = "Usuario Existente";
                 result.Status = false;
                 return result;
-            }
+            }            
             //Mapear usuarios entity desde user account dto
             var usuarioMap = _mapper.Map<Usuarios>(usuario);
             //Hashear contraseña
@@ -120,6 +121,7 @@ namespace Business.UserAccountBusiness
             //consulta de el user id 
             var verificarUsaurio =  _context.Usuarios
                 .Where(u=>u.IdUsuario == user.IdUsuario)
+                .AsNoTracking() //No trackear el registro
                 .FirstOrDefault();
             //si exite el email en la base de datos
             if (verificarUsaurio == null)
@@ -134,14 +136,45 @@ namespace Business.UserAccountBusiness
             {
                 user.Password = Hash(user.Password);
             }
+            else
+            {
+                //Dejar la misma contraseña
+                user.Password = verificarUsaurio.Password;
+            }
+
             //Mapeamos la clase
             verificarUsaurio = _mapper.Map<Usuarios>(user);
+
+            /* // o asignamos los valores de la entidad manualmente                       
+                verificarUsaurio.Nombre = user.Nombre;
+                verificarUsaurio.Password = user.Password;
+                verificarUsaurio.Apellido = user.Apellido;
+             */
+
             //Update de usuarios
             var usuarioActualizado = _context.Update(verificarUsaurio);
             _context.SaveChanges();
             //Mapeo para retornar el dto
             result = _mapper.Map<UserAccountDTO>(usuarioActualizado.Entity);
             result.Password = null;
+
+            return result;
+        }
+
+        public async Task<bool> DeleteUsuario(int idUsuario)
+        {
+            var result = false;
+
+            var usuario = await _context.Usuarios
+                .Where(u => u.IdUsuario == idUsuario)
+                .FirstOrDefaultAsync();
+
+            if(usuario != null)
+            {
+                _context.Remove(usuario);
+                _context.SaveChanges();
+                result = true;
+            }
 
             return result;
         }

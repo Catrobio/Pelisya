@@ -57,9 +57,8 @@ namespace Web.Controllers
             var userAccountResult = await response.Content.ReadFromJsonAsync<UserAccountModel>();
 
             if (userAccountResult.ErrorCode != null)
-            {
-                userAccount.Error = userAccountResult.Error;
-                return View(userAccount);
+            {                
+                return View(userAccountResult);
             }
             return RedirectToAction("Login", "Useraccount");
         }
@@ -80,10 +79,10 @@ namespace Web.Controllers
 
             var userAccountResult = await response.Content.ReadFromJsonAsync<UserAccountModel>();
 
-            if(userAccountResult.Error != null)
+            if(userAccountResult.Message != null)
             {
                 userAccount.Message = userAccountResult.Error;
-                return View(userAccount);                
+                return View(userAccountResult);                
             }
 
             _session.SetSession("usuarioActivo", userAccountResult.UserName);

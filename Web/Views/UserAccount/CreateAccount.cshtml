@@ -2,11 +2,11 @@
 
 @{
     ViewData["Title"] = "CreateAccount";
+    Layout = "~/Views/Shared/_LayoutLogin.cshtml";
 }
 
-<h1>CreateAccount</h1>
+<h1>Nuevo usuario</h1>
 
-<h4>UserAccountModel</h4>
 <hr />
 <div class="row">
     <div class="col-md-4">
@@ -54,13 +54,15 @@
 </div>
 
 <div>
-    <a asp-action="Index">Back to List</a>
+    <a class="nav-link text-dark" asp-area="" asp-controller="UserAccount" asp-action="Login"> Back to List</a>
 </div>
 <script src="~/lib/jquery/jquery.min.js"></script>
 <script>
+    $("body").removeClass("bg-gradient-primary");
     let errorCod = @Model.ErrorCode;
+    let errorMessage = '@Model.Message';
     if (errorCod != 0) {
-        alert('@Model.Message');
+        alert(errorMessage);
     }
     $.ajax({
         type:"GET",

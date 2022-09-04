@@ -6,6 +6,9 @@ using System.IO;
 using System.Text;
 using System;
 using System.Security.Cryptography;
+using System.IdentityModel.Tokens.Jwt;
+using Microsoft.IdentityModel.Tokens;
+using System.Security.Claims;
 
 namespace Business.UserAccountBusiness
 {
@@ -67,10 +70,7 @@ namespace Business.UserAccountBusiness
                         result = _mapper.Map<UserAccountDTO>(usuario);
 
                         result.Password = "";
-
-                        result.Token = usuario.Email + "." + usuario.Nombre;
-                        result.Created = DateTime.Now;
-                        result.Validate = DateTime.Now.AddMinutes(5);
+                                          
                     }
                     else
                     {
@@ -192,6 +192,7 @@ namespace Business.UserAccountBusiness
             
             return true;
         }
+       
 
         private string Hash(string textPlain)
         {

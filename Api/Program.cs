@@ -2,11 +2,9 @@ using Business.Mappers;
 using Business.UsuariosBusinnes;
 using Business.UserAccountBusiness;
 using Business.CategoriasBusiness;
-using Microsoft.OpenApi.Models;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.IdentityModel.Tokens;
 using System.Text;
-using Microsoft.Extensions.Configuration;
 
 string CorsPolicy = "ApiCors";
 
@@ -18,7 +16,7 @@ var builder = WebApplication.CreateBuilder(args);
 builder.Services.AddScoped<IUsuariosBusiness, UsuariosBusiness>();
 builder.Services.AddScoped<IUserAccountBusiness, UserAccountBusiness>();
 builder.Services.AddScoped<ICategoriasBusiness, CategoriasBusiness>();
-builder.Services.AddControllers();
+
 
 //Añadimos la configuracion de CORS policy
 builder.Services.AddCors(op =>
@@ -32,46 +30,29 @@ builder.Services.AddCors(op =>
 );
 
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
+builder.Services.AddControllers();
+// Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
 builder.Services.AddEndpointsApiExplorer();
-builder.Services.AddSwaggerGen(c =>
-{
-    c.SwaggerDoc("v1", new OpenApiInfo { Title = "apibirras", Version = "v1" });
-    var securityScheme = new OpenApiSecurityScheme
-    {
-        Name = "Authorization",
-        Description = "Seguraridad basada en token. Ingresar Bearer seguido del token obtenido en el authentication",
-        In = ParameterLocation.Header,
-        Type = SecuritySchemeType.ApiKey,
-        Scheme = "Bearer",
-        Reference = new OpenApiReference
+builder.Services.AddSwaggerGen();
+
+//builder.Configuration.AddJsonFile("appsettings.json");
+//var secretKey = builder.Configuration.GetSection("settings").GetSection("secretKey").ToString();// "=Codig0Estudiant3=";
+var keyBytes = Encoding.UTF8.GetBytes("ABCDEFGHIJKLMNOPQRSTUVWXYZ");
+
+builder.Services.AddAuthentication(config => {
+
+        config.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
+        config.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
+    }).AddJwtBearer(config => {
+        config.RequireHttpsMetadata = false;
+        config.SaveToken = false;
+        config.TokenValidationParameters = new TokenValidationParameters
         {
-            Id = JwtBearerDefaults.AuthenticationScheme,
-            Type = ReferenceType.SecurityScheme
-        }
-    };
-    c.AddSecurityDefinition(securityScheme.Reference.Id, securityScheme);
-
-    var securityRequirement = new OpenApiSecurityRequirement
-                    {
-                        {securityScheme, new string[] { }}
-                    };
-
-    c.AddSecurityRequirement(securityRequirement);
-});
-builder.Services.AddAuthentication(options =>
-{
-    options.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
-    options.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
-}).AddJwtBearer(options =>
-{
-    options.TokenValidationParameters = new TokenValidationParameters
-    {
-        ValidateIssuer = false,
-        ValidateAudience = false,
-        ValidateLifetime = true,
-        ValidateIssuerSigningKey = true,
-        IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes("ABCDEFGHIJKLMNOPQRSTUVWXYZ"))
-    };
+            ValidateIssuerSigningKey = true,
+            IssuerSigningKey = new SymmetricSecurityKey(keyBytes),
+            ValidateIssuer = false,
+            ValidateAudience = false
+        };
 });
 
 var app = builder.Build();
@@ -82,10 +63,14 @@ if (app.Environment.IsDevelopment())
     app.UseSwagger();
     app.UseSwaggerUI();
 }
+
 //Implementamos la politica de CORS
 app.UseCors("ApiCors");
-app.UseAuthorization();
+
 app.UseAuthentication();
+
+app.UseAuthorization();
+
 app.MapControllers();
 
 app.Run();

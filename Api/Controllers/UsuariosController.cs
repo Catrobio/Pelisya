@@ -4,10 +4,10 @@ using Business.DTOs;
 using Microsoft.AspNetCore.Authorization;
 
 namespace Api.Controllers
-{
-    [Authorize]
+{   
     [Produces("application/json")]
     [Route("api/[controller]")]
+    [Authorize]
     [ApiController]
    
     public class UsuariosController : Controller

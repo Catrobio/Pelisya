@@ -7,7 +7,7 @@ namespace Api.Controllers
 {   
     [Produces("application/json")]
     [Route("api/[controller]")]
-    [Authorize]
+    [Authorize(Roles = "3")]
     [ApiController]
    
     public class UsuariosController : Controller

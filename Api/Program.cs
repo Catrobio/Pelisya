@@ -5,6 +5,7 @@ using Business.CategoriasBusiness;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.IdentityModel.Tokens;
 using System.Text;
+using Microsoft.Extensions.DependencyInjection;
 
 string CorsPolicy = "ApiCors";
 
@@ -34,10 +35,11 @@ builder.Services.AddControllers();
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
-
-//builder.Configuration.AddJsonFile("appsettings.json");
-//var secretKey = builder.Configuration.GetSection("settings").GetSection("secretKey").ToString();// "=Codig0Estudiant3=";
-var keyBytes = Encoding.UTF8.GetBytes("ABCDEFGHIJKLMNOPQRSTUVWXYZ");
+//LLamamos el archivo de configuración
+builder.Configuration.AddJsonFile("appsettings.Development.json");
+//Localiza mi variable para generar el token
+var secretKey = builder.Configuration["Authentication:SecretKey"].ToString();
+var keyBytes = Encoding.UTF8.GetBytes(secretKey);
 
 builder.Services.AddAuthentication(config => {
 
@@ -51,7 +53,7 @@ builder.Services.AddAuthentication(config => {
             ValidateIssuerSigningKey = true,
             IssuerSigningKey = new SymmetricSecurityKey(keyBytes),
             ValidateIssuer = false,
-            ValidateAudience = false
+            ValidateAudience = false            
         };
 });
 

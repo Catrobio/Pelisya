@@ -29,7 +29,7 @@ namespace Api.Controllers
             {
                 /*Aca retornamos el token */
                 usuario.Token = GenToken(usuario);
-                usuario.Validate = DateTime.UtcNow.AddHours(1);
+                usuario.Validate = DateTime.UtcNow.AddMinutes(30);
                 usuario.Created = DateTime.UtcNow;
             }
             return usuario;
@@ -61,23 +61,30 @@ namespace Api.Controllers
 
         private string GenToken(UserAccountDTO usuario)
         {
+            var key = _configuration["Authentication:SecretKey"];
+            var keyBytes = Encoding.ASCII.GetBytes(key);          
 
-            var keyBytes = Encoding.ASCII.GetBytes("ABCDEFGHIJKLMNOPQRSTUVWXYZ");
-            var claims = new ClaimsIdentity();
-            claims.AddClaim(
-                new Claim(
-                        ClaimTypes.NameIdentifier,
-                        usuario.UserName
-                    ));
-
-           
             var tokenDescriptor = new SecurityTokenDescriptor
-            {
-                Subject = claims,
+            {                
+                Subject = new ClaimsIdentity(
+                     new[]
+                     {
+                        new Claim(
+                            ClaimTypes.NameIdentifier,
+                            usuario.UserName
+                    ),
+                        new Claim(
+                            ClaimTypes.Role,
+                            usuario.IdCategoria.ToString()
+                    )
+                     }
+               ),
                 Expires = DateTime.UtcNow.AddMinutes(30),
-                SigningCredentials = new SigningCredentials(
+                SigningCredentials = new SigningCredentials
+                (
                     new SymmetricSecurityKey(keyBytes), 
-                    SecurityAlgorithms.HmacSha256Signature)
+                    SecurityAlgorithms.HmacSha256Signature
+                )
 
             };
 

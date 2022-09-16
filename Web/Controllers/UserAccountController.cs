@@ -86,6 +86,7 @@ namespace Web.Controllers
             }
 
             _session.SetSession("usuarioActivo", userAccountResult.UserName);
+            _session.SetSession("Token", userAccountResult.Token);
 
             //await _loaclStorage.SetValue("UserName", userAccountResult.UserName);
 

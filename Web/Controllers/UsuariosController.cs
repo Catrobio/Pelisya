@@ -26,6 +26,7 @@ namespace Web.Controllers
                 return RedirectToAction("Login", "UserAccount");           
             }
 
+
             var listUsuariosModel = new List<UsuariosModel>();
 
             var token = _session.GetSession("Token");

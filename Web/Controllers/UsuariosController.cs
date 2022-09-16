@@ -30,7 +30,7 @@ namespace Web.Controllers
             var listUsuariosModel = new List<UsuariosModel>();
 
             var token = _session.GetSession("Token");
-           
+
             _httpRequest.Headers.Authorization = new AuthenticationHeaderValue("Bearer", token);
             _httpRequest.Method = new HttpMethod("GET");
             _httpRequest.RequestUri = new Uri("http://localhost:5002/api/Usuarios/Lista");

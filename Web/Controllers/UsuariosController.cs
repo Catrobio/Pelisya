@@ -2,6 +2,7 @@
 using Microsoft.AspNetCore.Mvc;
 using Web.Models;
 using Web.Helpers;
+using System.Net.Http.Headers;
 
 namespace Web.Controllers
 {
@@ -22,10 +23,14 @@ namespace Web.Controllers
         {
             if (!_session.IsSessionActive("usuarioActivo"))
             {
-                return RedirectToAction("Login", "UserAccount");
+                return RedirectToAction("Login", "UserAccount");           
             }
 
             var listUsuariosModel = new List<UsuariosModel>();
+
+            var token = _session.GetSession("Token");
+           
+            _httpRequest.Headers.Authorization = new AuthenticationHeaderValue("Bearer", token);
             _httpRequest.Method = new HttpMethod("GET");
             _httpRequest.RequestUri = new Uri("http://localhost:5002/api/Usuarios/Lista");
             var response = _httpClient.Send(_httpRequest);

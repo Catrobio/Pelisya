@@ -8,13 +8,11 @@ namespace Web.Controllers
 {
     public class UsuariosController : Controller
     {
-        HttpRequestMessage _httpRequest;
-        HttpClient _httpClient;
+        private ActionHelpers _actions;
         private SessionsHelpers _session;
-        public UsuariosController(SessionsHelpers sessions)
+        public UsuariosController(SessionsHelpers sessions, ActionHelpers actions)
         {
-            _httpRequest = new HttpRequestMessage();
-            _httpClient = new HttpClient();
+            _actions = actions;
             _session = sessions;
         }
 
@@ -30,12 +28,12 @@ namespace Web.Controllers
             var listUsuariosModel = new List<UsuariosModel>();
 
             var token = _session.GetSession("Token");
-
-            _httpRequest.Headers.Authorization = new AuthenticationHeaderValue("Bearer", token);
-            _httpRequest.Method = new HttpMethod("GET");
-            _httpRequest.RequestUri = new Uri("http://localhost:5002/api/Usuarios/Lista");
-            var response = _httpClient.Send(_httpRequest);
-            listUsuariosModel = await response.Content.ReadFromJsonAsync<List<UsuariosModel>>();
+           
+            listUsuariosModel = await _actions.
+                    SendAsyncSecureRequets<List<UsuariosModel>>(
+                    "GET",
+                    "http://localhost:5002/api/Usuarios/Lista",
+                    token);           
 
             return View(listUsuariosModel);
         }

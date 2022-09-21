@@ -13,8 +13,10 @@ builder.Services.AddSession(options =>
 
 //Inyeccion de dependencia
 builder.Services.AddHttpContextAccessor();
+builder.Services.AddSingleton<HttpClient>();
 builder.Services.AddSingleton<SessionsHelpers>();
 builder.Services.AddScoped<LocalStorageHelpers>();
+builder.Services.AddSingleton<ActionHelpers>();
 
 // Add services to the container.
 builder.Services.AddControllersWithViews();

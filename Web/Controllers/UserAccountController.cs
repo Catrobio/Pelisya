@@ -6,17 +6,13 @@ namespace Web.Controllers
 {
     public class UserAccountController : Controller
     {
-        HttpRequestMessage _httpRequest;
-        HttpClient _httpClient;
         private SessionsHelpers _session;
-        private LocalStorageHelpers _loaclStorage;
+        private ActionHelpers _actions;
 
-        public UserAccountController(SessionsHelpers sessions, LocalStorageHelpers loaclStorage)
-        {
-            _httpRequest = new HttpRequestMessage();
-            _httpClient = new HttpClient();
+        public UserAccountController(SessionsHelpers sessions, ActionHelpers actions)
+        {            
             _session = sessions;
-            _loaclStorage = loaclStorage;
+            _actions = actions;
         }
         public IActionResult Login()
         {
@@ -47,14 +43,12 @@ namespace Web.Controllers
         [HttpPost]
         public async Task<IActionResult> CreateAccount(UserAccountModel userAccount)
         {
-            //userAccount.IdUsuario = 0;
-            _httpRequest.Method = new HttpMethod("POST");
-            _httpRequest.RequestUri = new Uri("http://localhost:5002/api/UserAccount/Create");
-            _httpRequest.Content = JsonContent.Create(userAccount);
-
-            var response = await _httpClient.SendAsync(_httpRequest);
-
-            var userAccountResult = await response.Content.ReadFromJsonAsync<UserAccountModel>();
+           
+            var userAccountResult = await _actions.
+                    SendAsyncRequets<UserAccountModel>(
+                    "POST",
+                    "http://localhost:5002/api/UserAccount/Create",
+                    userAccount);
 
             if (userAccountResult.ErrorCode != null)
             {                
@@ -66,22 +60,21 @@ namespace Web.Controllers
         [HttpPost]
         public async Task<IActionResult> Login(string userName, string password)
         {
-            var userAccount = new LoginModel();
+            var userLogin = new LoginModel();
 
-            userAccount.UserName = userName;
-            userAccount.Password = password;            
+            userLogin.UserName = userName;
+            userLogin.Password = password;
 
-            _httpRequest.Method = new HttpMethod("POST");
-            _httpRequest.RequestUri = new Uri("http://localhost:5002/api/UserAccount/Login");
-            _httpRequest.Content = JsonContent.Create(userAccount);
-
-            var response = await _httpClient.SendAsync(_httpRequest);
-
-            var userAccountResult = await response.Content.ReadFromJsonAsync<UserAccountModel>();
+            var userAccountResult = await _actions.
+                    SendAsyncRequets<UserAccountModel>(
+                    "POST", 
+                    "http://localhost:5002/api/UserAccount/Login", 
+                    userLogin);
+                        
 
             if(userAccountResult.Message != null)
             {
-                userAccount.Message = userAccountResult.Error;
+                userLogin.Message = userAccountResult.Error;
                 return View(userAccountResult);                
             }
 

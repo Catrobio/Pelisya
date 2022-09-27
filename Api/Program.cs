@@ -6,6 +6,7 @@ using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.IdentityModel.Tokens;
 using System.Text;
 using Microsoft.Extensions.DependencyInjection;
+using Business.PeliculasBusiness;
 
 string CorsPolicy = "ApiCors";
 
@@ -17,6 +18,7 @@ var builder = WebApplication.CreateBuilder(args);
 builder.Services.AddScoped<IUsuariosBusiness, UsuariosBusiness>();
 builder.Services.AddScoped<IUserAccountBusiness, UserAccountBusiness>();
 builder.Services.AddScoped<ICategoriasBusiness, CategoriasBusiness>();
+builder.Services.AddScoped<IPeliculasBusiness, PeliculasBusiness>();
 
 
 //Añadimos la configuracion de CORS policy

@@ -1,16 +1,7 @@
-﻿using System;
-using System.Collections.Generic;
-
-namespace EntityLib
+﻿namespace Web.Models
 {
-    public partial class Peliculas
+    public class PeliculasModel : ErrorModel
     {
-        public Peliculas()
-        {
-            Listas = new HashSet<Listas>();
-            Subcategorias = new HashSet<Subcategorias>();
-        }
-
         public int IdPelicula { get; set; }
         public int IdCategoriaPeliculas { get; set; }
         public string? Nombre { get; set; }
@@ -22,9 +13,15 @@ namespace EntityLib
         public string? ActorSecundario2 { get; set; }
         public string? IdImdb { get; set; }
         public string? Portada { get; set; }
+        public IMDBDataMovie IMDBData { get; set; }
+    }
 
-        public virtual Categoriacontenido IdCategoriaPeliculasNavigation { get; set; } = null!;
-        public virtual ICollection<Listas> Listas { get; set; }
-        public virtual ICollection<Subcategorias> Subcategorias { get; set; }
+    public class IMDBDataMovie
+    {        
+        public string id { get; set; }
+        public string title { get; set; }
+        public float rating { get; set; }
+        public string image { get; set; }
+
     }
 }

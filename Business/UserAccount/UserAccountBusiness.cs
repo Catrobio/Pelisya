@@ -9,6 +9,7 @@ using System.Security.Cryptography;
 using System.IdentityModel.Tokens.Jwt;
 using Microsoft.IdentityModel.Tokens;
 using System.Security.Claims;
+using System.Data.Entity.Core;
 
 namespace Business.UserAccountBusiness
 {
@@ -45,39 +46,62 @@ namespace Business.UserAccountBusiness
         {
             var result = new UserAccountDTO();
 
-            if (string.IsNullOrEmpty(userLogin.UserName) || string.IsNullOrEmpty(userLogin.Password))
+            try
             {
-                result.Message = "Usuario y contraseña no puede ser vacio";
-            }
-            else
-            {
-                var usuario = await _context.Usuarios
-                    .Where(u =>
-                        u.Email == userLogin.UserName
-                        ).FirstOrDefaultAsync();
-
-
-                if (usuario == null)
+                if (string.IsNullOrEmpty(userLogin.UserName) || string.IsNullOrEmpty(userLogin.Password))
                 {
-                    result.Message = "Usuario no existe";
+                    result.Message = "Usuario y contraseña no puede ser vacio";
                 }
                 else
                 {
-                    
+                    var usuario = await _context.Usuarios
+                        .Where(u =>
+                            u.Email == userLogin.UserName
+                            ).FirstOrDefaultAsync();
 
-                    if (VerifyHash(userLogin.Password, usuario.Password))
+
+                    if (usuario == null)
                     {
-                        result = _mapper.Map<UserAccountDTO>(usuario);
-
-                        result.Password = "";
-                                          
+                        result.Message = "Usuario no existe";
                     }
                     else
                     {
-                        result.Message = "Usuario o contraseña incorrecta";
+
+
+                        if (VerifyHash(userLogin.Password, usuario.Password))
+                        {                            
+                            result = _mapper.Map<UserAccountDTO>(usuario);
+
+                            result.Password = "";
+
+                        }
+                        else
+                        {
+                            result.Message = "Usuario o contraseña incorrecta";
+                        }
                     }
                 }
+                
             }
+            catch(AutoMapperMappingException ae)
+            {
+                result.ErrorCode = -300;
+                result.Message = $"Error interno: {ae.Message}";
+                return result;
+            }
+            catch (EntityException ee)
+            {               
+                result.ErrorCode = -200;
+                result.Message = $"Error interno: {ee.Message}";
+                return result;
+            }
+            catch (Exception e)
+            {
+                result.ErrorCode = -100;
+                result.Message = $"Error interno: {e.Message}";
+                return result;
+            }
+           
             return result;
         }
 

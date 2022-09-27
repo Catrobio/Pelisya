@@ -74,7 +74,9 @@ namespace Web.Controllers
 
             if(userAccountResult.Message != null)
             {
-                userLogin.Message = userAccountResult.Error;
+                if(userAccountResult.ErrorCode == -100)
+                    userAccountResult.Message = "Error interno, Estamos en mantenimiento";                                    
+                                
                 return View(userAccountResult);                
             }
 

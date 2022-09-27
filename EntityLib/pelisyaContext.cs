@@ -189,7 +189,13 @@ namespace EntityLib
 
                 entity.Property(e => e.Fecha).HasColumnName("fecha");
 
+                entity.Property(e => e.IdImdb)
+                    .HasMaxLength(100)
+                    .HasColumnName("IdIMDB");
+
                 entity.Property(e => e.Nombre).HasMaxLength(200);
+
+                entity.Property(e => e.Portada).HasMaxLength(300);
 
                 entity.HasOne(d => d.IdCategoriaPeliculasNavigation)
                     .WithMany(p => p.Peliculas)
@@ -221,7 +227,13 @@ namespace EntityLib
 
                 entity.Property(e => e.Fecha).HasColumnName("fecha");
 
+                entity.Property(e => e.IdImdb)
+                    .HasMaxLength(100)
+                    .HasColumnName("IdIMDB");
+
                 entity.Property(e => e.Nombre).HasMaxLength(200);
+
+                entity.Property(e => e.Portada).HasMaxLength(1000);
 
                 entity.HasOne(d => d.IdCategoriaSeriesNavigation)
                     .WithMany(p => p.Series)

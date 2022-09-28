@@ -30,5 +30,35 @@ namespace Api.Controllers
             return BadRequest();
         }
 
+        [HttpPut("")]
+        public async Task<IActionResult> PutPeliculas([FromBody] PeliculasDTO peliculaDTO)
+        {
+            var result = await _peliculasBusiness.UpdatePeliculas(peliculaDTO);
+            if (result != null)
+            {
+                if (result.ErrorCode != null)
+                {
+                    return StatusCode(500, result);
+                }
+                return Ok(result);
+            }
+            return BadRequest();
+        }
+
+        [HttpPost("")]
+        public async Task<IActionResult> PostPeliculas([FromBody] PeliculasDTO peliculaDTO)
+        {
+            var result = await _peliculasBusiness.InsertPeliculas(peliculaDTO);
+            if (result != null)
+            {
+                if (result.ErrorCode != null)
+                {
+                    return StatusCode(500, result);
+                }
+                return Ok(result);
+            }
+            return BadRequest();
+        }
+
     }
 }

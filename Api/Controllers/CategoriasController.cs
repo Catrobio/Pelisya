@@ -15,10 +15,16 @@ namespace Api.Controllers
             _categoriasBusiness = categoriasBusiness;
         }
 
-        [HttpGet("Todas")]
-        public async Task<List<CategoriasDTO>> GetCategoria()
+        [HttpGet("Usuarios")]
+        public async Task<List<CategoriasDTO>> GetCategoriaUsuarios()
         {
             return await _categoriasBusiness.GetCategorias();
+        }
+
+        [HttpGet("Peliculas")]
+        public async Task<List<CategoriasDTO>> GetCategoriaPeliculas()
+        {
+            return await _categoriasBusiness.GetCategoriasPeliculas();
         }
 
     }

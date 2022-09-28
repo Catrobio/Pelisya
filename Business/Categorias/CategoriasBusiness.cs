@@ -8,6 +8,7 @@ namespace Business.CategoriasBusiness
     public interface ICategoriasBusiness
     {
         Task<List<CategoriasDTO>> GetCategorias();
+        Task<List<CategoriasDTO>> GetCategoriasPeliculas();
     }
 
     public class CategoriasBusiness : ICategoriasBusiness
@@ -22,7 +23,9 @@ namespace Business.CategoriasBusiness
             var config = new MapperConfiguration(cfg =>
             {
                 cfg.CreateMap<Categoriasusuarios, CategoriasDTO>()               
-                .ReverseMap();                
+                .ReverseMap();
+                cfg.CreateMap<Categoriacontenido, CategoriasDTO>()
+                .ReverseMap();
             });
             _mapper = config.CreateMapper();
         }
@@ -32,6 +35,18 @@ namespace Business.CategoriasBusiness
             var result = new List<CategoriasDTO>();
 
             var categorias = await _context.Categoriasusuarios
+                .ToListAsync();
+
+            result = _mapper.Map<List<CategoriasDTO>>(categorias);
+
+            return result;
+        }
+
+        public async Task<List<CategoriasDTO>> GetCategoriasPeliculas()
+        {
+            var result = new List<CategoriasDTO>();
+
+            var categorias = await _context.Categoriacontenido
                 .ToListAsync();
 
             result = _mapper.Map<List<CategoriasDTO>>(categorias);

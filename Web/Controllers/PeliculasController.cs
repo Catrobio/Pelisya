@@ -28,45 +28,76 @@ namespace Web.Controllers
                     "GET",
                     "http://localhost:5002/api/Peliculas");
 
-            foreach (var peliculas in listaPeliculas)
+            foreach (var pelicula in listaPeliculas)
             {
-                if(string.IsNullOrEmpty(peliculas.Portada))
+                if (string.IsNullOrEmpty(pelicula.Portada))
                 {
                     var imdbData = await _actions.SendAsyncHeadersRequets<IMDBDataMovie>(
                     "GET",
-                    $"https://movie-details1.p.rapidapi.com/imdb_api/movie?id={peliculas.IdImdb}");
-                    peliculas.Portada = imdbData.image;
+                    $"https://movie-details1.p.rapidapi.com/imdb_api/movie?id={pelicula.IdImdb}");
+                    pelicula.Portada = imdbData.image;
+
+                    /*Actualizar portada por cada pelicula*/
+                    var peliculaActualizada = await _actions.
+                    SendAsyncRequets<PeliculasModel>(
+                    "PUT",
+                    "http://localhost:5002/api/Peliculas", pelicula);
                 }
             }
 
-            return View(listaPeliculas);            
+            return View(listaPeliculas);
         }
 
         // GET: PeliculasController/Details/5
         public ActionResult Details(int id)
         {
+
             return View();
         }
 
         // GET: PeliculasController/Create
         public ActionResult Create()
         {
-            return View();
+            var pelicula = new PeliculasModel();
+            return View(pelicula);
         }
 
-        // POST: PeliculasController/Create
-        [HttpPost]
-        [ValidateAntiForgeryToken]
-        public ActionResult Create(IFormCollection collection)
+        [HttpGet]
+        public async Task<ActionResult> GetImdbInfo(string id)
         {
-            try
+            var imdbData = await _actions.SendAsyncHeadersRequets<IMDBDataMovie>(
+                "GET",
+                $"https://movie-details1.p.rapidapi.com/imdb_api/movie?id={id}");
+
+            var pelicula = new PeliculasModel
             {
-                return RedirectToAction(nameof(Index));
-            }
-            catch
-            {
-                return View();
-            }
+                ActorPrincipal = imdbData.actors[0].name,
+                ActorPrincipal2 = imdbData.actors[1].name,
+                ActorSecundario = imdbData.actors[2].name,
+                ActorSecundario2 = imdbData.actors[3].name,
+                Descripcion = imdbData.description,
+                Fecha = imdbData.imdb_date,
+                IdCategoriaPeliculas = 1,
+                IdImdb = imdbData.id,
+                Nombre = imdbData.title,
+                Portada = imdbData.image
+            };
+            
+
+            return View("Create", pelicula);
+        }
+
+
+        // POST: PeliculasController/Create
+        [HttpPost]        
+        public async Task<ActionResult> Create(PeliculasModel pelicula)
+        {            
+            var peliculaGuardada = await _actions.
+                SendAsyncRequets<PeliculasModel>(
+                "Post",
+                "http://localhost:5002/api/Peliculas", pelicula);
+
+                return RedirectToAction("Index");            
         }
 
         // GET: PeliculasController/Edit/5

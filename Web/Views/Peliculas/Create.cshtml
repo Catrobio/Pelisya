@@ -1,0 +1,94 @@
+﻿@model Web.Models.PeliculasModel
+
+@{
+    ViewData["Title"] = "Create";
+}
+
+<div class="card o-hidden border-0 shadow-lg my-5">
+            <div class="card-body p-0">
+                <!-- Nested Row within Card Body -->
+                <div class="row">
+                    <div class="col-lg-5 d-none d-lg-block"><img src="@Model.Portada" /> </div>
+                    <div class="col-lg-7">
+                        <div class="p-5">
+                            <div class="text-center">
+                                <h1 class="h4 text-gray-900 mb-4">Bucar Pelicula</h1>
+                            </div>
+                            <form class="user" method="get" action="GetImdbInfo">
+                                <div class="form-group row">
+                                    <div class="col-sm-6 mb-3 mb-sm-0">
+                                        <input type="text" class="form-control form-control-user" name="id" id="id"
+                                            placeholder="IMDBId">
+                                        <button type="submit" class="btn btn-primary btn-user btn-block">
+                                            Buscar
+                                        </button>
+                                    </div>   
+                                </div>   
+                            </form>
+                            Pelicula Solicitada
+                            <form class="user" method="post" action="Create">
+                                <div class="form-group row">
+                                    <div class="col-sm-6 mb-3 mb-sm-0">
+
+                                        <select name="IdCategoriaPeliculas" id="IdCategoriaPeliculas">
+                                        </select>
+
+                                    </div>
+                                    <div class="col-sm-6 mb-3 mb-sm-0">
+                                        <input type="text" readonly="readonly" class="form-control form-control-user" 
+                                            value="@Model.ActorPrincipal"   name="ActorPrincipal" id="ActorPrincipal">
+
+                                            <input type="text" readonly="readonly" class="form-control form-control-user" 
+                                            value="@Model.ActorPrincipal2"   name="ActorPrincipal2" id="ActorPrincipal2">
+
+                                            <input type="text" readonly="readonly" class="form-control form-control-user" 
+                                            value="@Model.ActorSecundario"   name="ActorSecundario" id="ActorSecundario">
+
+                                            <input type="text" readonly="readonly" class="form-control form-control-user" 
+                                            value="@Model.ActorSecundario2"   name="ActorSecundario2" id="ActorSecundario2">
+
+                                            <input type="text" readonly="readonly" class="form-control form-control-user" 
+                                            value="@Model.Descripcion"   name="Descripcion" id="Descripcion">
+
+                                            <input type="text" readonly="readonly" class="form-control form-control-user" 
+                                            value="@Model.Fecha"   name="Fecha" id="Fecha">
+
+                                            <input type="text" readonly="readonly" class="form-control form-control-user" 
+                                            value="@Model.Nombre"   name="Nombre" id="Nombre">
+
+                                            <input type="hidden" name="IdImdb" id="IdImdb" value="@Model.IdImdb" />
+                                            <input type="hidden" name="Portada" id="Portada" value="@Model.Portada" />
+                                            
+                                        <button type="submit" class="btn btn-primary btn-user btn-block">
+                                            Guardar
+                                        </button>
+                                    </div>   
+                                </div>   
+                            </form>
+                            <hr>                            
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+<script src="~/lib/jquery/jquery.min.js"></script>
+<script>   
+    $.ajax({
+        type:"GET",
+        url: "http://localhost:5002/api/Categorias/Peliculas",
+        contentType: "application/json; charset=utf-8",
+        dataType: "json",
+        success: function(data) {
+            let select = $("#IdCategoriaPeliculas");
+            let op = "";
+            $.each(data, function(i, obj) {
+                op += "<option value='" + obj.idCategoria + "'>" + obj.descripcion + "</option>";
+            });
+            select.html(op);
+        }
+    })
+</script>
+@section Scripts {
+    @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
+}

@@ -10,6 +10,7 @@ namespace Business.DTOs
     {
         public int IdPelicula { get; set; }
         public int IdCategoriaPeliculas { get; set; }
+        public string? Categoria { get; set; }
         public string? Nombre { get; set; }
         public string? Descripcion { get; set; }
         public DateTime Fecha { get; set; }

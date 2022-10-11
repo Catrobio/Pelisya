@@ -31,7 +31,7 @@ namespace Api.Controllers
                 usuario.Token = GenToken(usuario);
                 usuario.Validate = DateTime.UtcNow.AddMinutes(30);
                 usuario.Created = DateTime.UtcNow;
-            }
+            }                        
             return usuario;
         }
 

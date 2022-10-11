@@ -10,10 +10,12 @@ namespace Web.Controllers
         // GET: PeliculasController
         private ActionHelpers _actions;
         private SessionsHelpers _session;
-        public PeliculasController(SessionsHelpers sessions, ActionHelpers actions)
+        private IConfiguration _configuration;
+        public PeliculasController(SessionsHelpers sessions, ActionHelpers actions, IConfiguration configuration)
         {
             _actions = actions;
             _session = sessions;
+            _configuration = configuration;
         }
         public async Task<ActionResult> Index()
         {
@@ -26,7 +28,7 @@ namespace Web.Controllers
             listaPeliculas = await _actions.
                     SendAsyncRequets<List<PeliculasModel>>(
                     "GET",
-                    "http://localhost:5002/api/Peliculas");
+                    $"{_configuration["apiUrl"]}Peliculas");
 
             foreach (var pelicula in listaPeliculas)
             {
@@ -34,14 +36,17 @@ namespace Web.Controllers
                 {
                     var imdbData = await _actions.SendAsyncHeadersRequets<IMDBDataMovie>(
                     "GET",
-                    $"https://movie-details1.p.rapidapi.com/imdb_api/movie?id={pelicula.IdImdb}");
+                    $"https://movie-details1.p.rapidapi.com/imdb_api/movie?id={pelicula.IdImdb}",
+                    _configuration["RapidAPIKey"],
+                    _configuration["RapidAPIHost"]
+                    );
                     pelicula.Portada = imdbData.image;
 
                     /*Actualizar portada por cada pelicula*/
                     var peliculaActualizada = await _actions.
                     SendAsyncRequets<PeliculasModel>(
                     "PUT",
-                    "http://localhost:5002/api/Peliculas", pelicula);
+                    $"{_configuration["apiUrl"]}Peliculas", pelicula);
                 }
             }
 
@@ -67,7 +72,10 @@ namespace Web.Controllers
         {
             var imdbData = await _actions.SendAsyncHeadersRequets<IMDBDataMovie>(
                 "GET",
-                $"https://movie-details1.p.rapidapi.com/imdb_api/movie?id={id}");
+                $"https://movie-details1.p.rapidapi.com/imdb_api/movie?id={id}",
+                _configuration["RapidAPIKey"],
+                _configuration["RapidAPIHost"]
+                );
 
             var pelicula = new PeliculasModel
             {
@@ -75,9 +83,8 @@ namespace Web.Controllers
                 ActorPrincipal2 = imdbData.actors[1].name,
                 ActorSecundario = imdbData.actors[2].name,
                 ActorSecundario2 = imdbData.actors[3].name,
-                Descripcion = imdbData.description,
-                Fecha = imdbData.imdb_date,
-                IdCategoriaPeliculas = 1,
+                Descripcion = string.IsNullOrEmpty(imdbData.description) ? "N/A" : imdbData.description,
+                Fecha = imdbData.imdb_date,                
                 IdImdb = imdbData.id,
                 Nombre = imdbData.title,
                 Portada = imdbData.image
@@ -91,11 +98,12 @@ namespace Web.Controllers
         // POST: PeliculasController/Create
         [HttpPost]        
         public async Task<ActionResult> Create(PeliculasModel pelicula)
-        {            
+        {
+            pelicula.Categoria = "categoria";
             var peliculaGuardada = await _actions.
                 SendAsyncRequets<PeliculasModel>(
                 "Post",
-                "http://localhost:5002/api/Peliculas", pelicula);
+                $"{_configuration["apiUrl"]}Peliculas", pelicula);
 
                 return RedirectToAction("Index");            
         }

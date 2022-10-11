@@ -15,13 +15,13 @@ namespace Web.Controllers
             _session = sessions;
         }
 
-        public IActionResult Index()
+        public IActionResult Index(ErrorModel error)
         {
             if(!_session.IsSessionActive("usuarioActivo"))
             {
                return RedirectToAction("Login", "UserAccount");
             }
-            return View();
+            return View(error);
         }
 
         public IActionResult Privacy()

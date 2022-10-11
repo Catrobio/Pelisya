@@ -10,32 +10,71 @@ namespace Web.Controllers
     {
         private ActionHelpers _actions;
         private SessionsHelpers _session;
-        public UsuariosController(SessionsHelpers sessions, ActionHelpers actions)
+        private IConfiguration _configuration;
+        public UsuariosController(SessionsHelpers sessions, ActionHelpers actions, IConfiguration configuration)
         {
             _actions = actions;
             _session = sessions;
+            _configuration = configuration;
         }
 
         // GET: UsuariosController
         public async Task<ActionResult> Index()
         {
-            if (!_session.IsSessionActive("usuarioActivo"))
+            try
             {
-                return RedirectToAction("Login", "UserAccount");           
+                if (!_session.IsSessionActive("usuarioActivo"))
+                {
+                    return RedirectToAction("Login", "UserAccount");
+                }
+                var listUsuariosModel = new List<UsuariosModel>();
+
+                var token = _session.GetSession("Token");
+
+                if(string.IsNullOrEmpty(token))
+                {                    
+                    _session.ClearSession();
+                    var userAccountModel = new UserAccountModel
+                    {
+                        ErrorCode = -100,
+                        Message = "Error al interno del sistema, Token no valido"
+                    };
+                    return RedirectToAction("Login", "UserAccount", userAccountModel);                    
+                }
+
+                listUsuariosModel = await _actions.
+                        SendAsyncSecureRequets<List<UsuariosModel>>(
+                            "GET",
+                           $"{_configuration["apiUrl"]}Usuarios/Lista",
+                            token
+                        );
+                return View(listUsuariosModel);
             }
+            catch(Exception ex) 
+            {
+                // Para buscar una cadena de caracateres dentro del mensaje de la excepcion
+                /*if (ex.Message.Contains("token"))
+                {
+                    _session.ClearSession();
+                    var userAccountModel = new UserAccountModel
+                    {
+                        ErrorCode = -100,
+                        Message = "Error al interno del sistema, Token no valido"
+                    };
+                    return RedirectToAction("Login", "UserAccount", userAccountModel);
+                }*/
 
-
-            var listUsuariosModel = new List<UsuariosModel>();
-
-            var token = _session.GetSession("Token");
-           
-            listUsuariosModel = await _actions.
-                    SendAsyncSecureRequets<List<UsuariosModel>>(
-                    "GET",
-                    "http://localhost:5002/api/Usuarios/Lista",
-                    token);           
-
-            return View(listUsuariosModel);
+                var error = new ErrorModel
+                {
+                    ErrorCode = -100,
+                    Message = "Error al interno del sistema, Error en Lista de usuarios"
+                };
+                return RedirectToAction("Index", "Home", error);
+            }
+            finally
+            {
+                //metodo de logueo de errores
+            }
         }
 
         // GET: UsuariosController/Details/5

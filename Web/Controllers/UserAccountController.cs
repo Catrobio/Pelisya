@@ -8,20 +8,20 @@ namespace Web.Controllers
     {
         private SessionsHelpers _session;
         private ActionHelpers _actions;
+        private IConfiguration _configuration;
 
-        public UserAccountController(SessionsHelpers sessions, ActionHelpers actions)
-        {            
+        public UserAccountController(SessionsHelpers sessions, ActionHelpers actions, IConfiguration configuration)
+        {
             _session = sessions;
             _actions = actions;
+            _configuration = configuration;
         }
-        public IActionResult Login()
+        public IActionResult Login(UserAccountModel userAccount)
         {
             if (_session.IsSessionActive("usuarioActivo"))
             {
                 return RedirectToAction("Index", "Home");
-            }
-
-            var userAccount = new UserAccountModel();
+            }            
             return View(userAccount);
         }
 
@@ -47,7 +47,7 @@ namespace Web.Controllers
             var userAccountResult = await _actions.
                     SendAsyncRequets<UserAccountModel>(
                     "POST",
-                    "http://localhost:5002/api/UserAccount/Create",
+                   $"{_configuration["apiUrl"]}UserAccount/Create",
                     userAccount);
 
             if (userAccountResult.ErrorCode != null)
@@ -61,31 +61,42 @@ namespace Web.Controllers
         public async Task<IActionResult> Login(string userName, string password)
         {
             var userLogin = new LoginModel();
-
+            var userAccountResult = new UserAccountModel();
             userLogin.UserName = userName;
             userLogin.Password = password;
-
-            var userAccountResult = await _actions.
-                    SendAsyncRequets<UserAccountModel>(
-                    "POST", 
-                    "http://localhost:5002/api/UserAccount/Login", 
-                    userLogin);
-                        
-
-            if(userAccountResult.Message != null)
+            try
             {
-                if(userAccountResult.ErrorCode == -100)
-                    userAccountResult.Message = "Error interno, Estamos en mantenimiento";                                    
-                                
-                return View(userAccountResult);                
+                userAccountResult = await _actions.
+                    SendAsyncRequets<UserAccountModel>(
+                        "POST",
+                        $"{_configuration["apiUrl"]}UserAccount/Login",
+                        userLogin
+                    );
+
+
+                if (userAccountResult.Message != null)
+                {
+                    if (userAccountResult.ErrorCode == -100)
+                        userAccountResult.Message = "Error interno, Estamos en mantenimiento";
+
+                    return View(userAccountResult);
+                }
+
+                _session.SetSession("usuarioActivo", userAccountResult.UserName);
+                _session.SetSession("Token", userAccountResult.Token);
+
+                //await _loaclStorage.SetValue("UserName", userAccountResult.UserName);
+
+                return RedirectToAction("Index", "Usuarios");
             }
+            catch
+            {
+                userAccountResult.ErrorCode = -100;
+                userAccountResult.Message = $"Error interno del sistema";
 
-            _session.SetSession("usuarioActivo", userAccountResult.UserName);
-            _session.SetSession("Token", userAccountResult.Token);
-
-            //await _loaclStorage.SetValue("UserName", userAccountResult.UserName);
-
-            return RedirectToAction("Index", "Usuarios");                        
+                return View(userAccountResult);
+            }
+                                   
         }
     }
 }

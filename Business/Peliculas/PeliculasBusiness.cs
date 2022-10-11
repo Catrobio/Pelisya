@@ -122,8 +122,11 @@ namespace Business.PeliculasBusiness
                     var peliculaGuardar = _mapper.Map<Peliculas>(peliculaDTO);
 
                     // var peliculaGuardada = await _context.AddAsync(peliculaGuardar); Si queremos guardar en una variable la pelicula guardada
+                    //
+                    //peliculaGuardar.IdCategoriaPeliculasNavigation = null;
 
                     await _context.AddAsync(peliculaGuardar);
+
                     await _context.SaveChangesAsync();
 
                     result = peliculaDTO;

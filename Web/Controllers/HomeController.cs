@@ -21,6 +21,9 @@ namespace Web.Controllers
             {
                return RedirectToAction("Login", "UserAccount");
             }
+            ViewData["Rol"] = _session.GetSession("Rol");
+            //Agregamos el Nombre
+            ViewData["Nombre"] = _session.GetSession("Nombre");
             return View(error);
         }
 

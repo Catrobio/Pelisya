@@ -84,10 +84,14 @@ namespace Web.Controllers
 
                 _session.SetSession("usuarioActivo", userAccountResult.UserName);
                 _session.SetSession("Token", userAccountResult.Token);
+                _session.SetSession("Rol", userAccountResult.IdCategoria.ToString());
+                _session.SetSession("Nombre", userAccountResult.Nombre);
 
                 //await _loaclStorage.SetValue("UserName", userAccountResult.UserName);
+                if (userAccountResult.IdCategoria == 3)
+                    return RedirectToAction("Index", "Usuarios");
 
-                return RedirectToAction("Index", "Usuarios");
+                return RedirectToAction("Index", "Home");
             }
             catch
             {

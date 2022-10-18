@@ -61,21 +61,41 @@
                 @Html.DisplayFor(modelItem => item.FechaAlta)
             </td>
             <td>
-                @Html.ActionLink("Edit", "Edit", new { /* id=item.PrimaryKey */ }) |
-                @Html.ActionLink("Details", "Details", new { id=item.IdUsuario }) |
-                @Html.ActionLink("Delete", "Delete", new { /* id=item.PrimaryKey */ })
-            </td>
-                @foreach (var fac in item.ListaFacturas)
-                {
-                  <tr>
-                    <td>
-                        @Html.DisplayFor(modelItem => fac.Monto)
-                    </td>
-                    <td>
-                        @Html.DisplayFor(modelItem => fac.Fecha)
-                    </td>
-                  </tr>  
+               
+                    @Html.ActionLink("Edit", "Edit", new { /* id=item.PrimaryKey */ })|
+                    @Html.ActionLink("Details", "Details", new { id = item.IdUsuario })|
+                @{
+                    if( ViewData["Rol"].ToString() == "3")
+                    {                        
+                    
+                        @Html.ActionLink("Delete", "Delete", new { /* id=item.PrimaryKey */ })
+                    }                    
                 }
+            </td>
+                @{
+                    if( ViewData["Rol"].ToString() == "4")
+                    {
+                            <tr>
+                                <td>
+                                    Monto                        
+                                </td>
+                                <td>
+                                    Fecha
+                                </td>
+                            </tr> 
+                            @foreach (var fac in item.ListaFacturas)
+                        {
+                              <tr>
+                                <td>
+                                    @Html.DisplayFor(modelItem => fac.Monto)
+                                </td>
+                                <td>
+                                    @Html.DisplayFor(modelItem => fac.Fecha)
+                                </td>
+                              </tr>  
+                        }
+                    }
+                }                
             </tr>
 }
     </tbody>

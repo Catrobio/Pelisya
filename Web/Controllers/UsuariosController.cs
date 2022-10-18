@@ -27,6 +27,14 @@ namespace Web.Controllers
                 {
                     return RedirectToAction("Login", "UserAccount");
                 }
+                if (_session.GetSession("Rol") != "3" && _session.GetSession("Rol") != "4")
+                {
+                    return RedirectToAction("Index", "Home");
+                }
+                //Agregamos el rol
+                ViewData["Rol"] = _session.GetSession("Rol");
+                //Agregamos el Nombre
+                ViewData["Nombre"] = _session.GetSession("Nombre");
                 var listUsuariosModel = new List<UsuariosModel>();
 
                 var token = _session.GetSession("Token");

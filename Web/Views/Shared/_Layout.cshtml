@@ -16,8 +16,26 @@
     <header>
         <nav class="navbar navbar-expand-sm navbar-toggleable-sm navbar-light bg-white border-bottom box-shadow mb-3">
             <div class="container-fluid">
-                <a class="navbar-brand" asp-area="" asp-controller="Home" asp-action="Index">Web</a>
-                <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target=".navbar-collapse" aria-controls="navbarSupportedContent"
+                @ViewData["Nombre"]  
+                @{
+                    switch (ViewData["Rol"].ToString())
+                    {
+                        case "3":
+                            <b> -Administrador</b>
+                            break;
+                        case "2":
+                            <b> -4K</b>
+                            break;
+                       case "1":
+                            <b> -HD</b>
+                            break;
+                        case "4":
+                            <b> -Cobranza</b>
+                            break;
+                    }
+                    
+                }
+                    <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target=".navbar-collapse" aria-controls="navbarSupportedContent"
                         aria-expanded="false" aria-label="Toggle navigation">
                     <span class="navbar-toggler-icon"></span>
                 </button>
@@ -29,9 +47,19 @@
                         <li class="nav-item">
                             <a class="nav-link text-dark" asp-area="" asp-controller="Peliculas" asp-action="Index">Peliculas</a>
                         </li>
-                        <li class="nav-item">
-                            <a class="nav-link text-dark" asp-area="" asp-controller="Usuarios" asp-action="Index">Usuarios</a>
-                        </li>
+                        @{
+                            if(
+                                ViewData["Rol"].ToString() == "3" 
+                                || 
+                                ViewData["Rol"].ToString() == "4"
+                            )
+                            {
+                                <li class="nav-item">
+                                    <a class="nav-link text-dark" asp-area="" asp-controller="Usuarios" asp-action="Index">Usuarios</a>
+                                </li>
+                            }
+                        }
+                        
                          <li class="nav-item">
                             <a class="nav-link text-dark" asp-area="" asp-controller="UserAccount" asp-action="Logout">Salir</a>
                         </li>

@@ -35,6 +35,7 @@ namespace Business.CategoriasBusiness
             var result = new List<CategoriasDTO>();
 
             var categorias = await _context.Categoriasusuarios
+                .Where(c => c.IdCategoria != 3)
                 .ToListAsync();
 
             result = _mapper.Map<List<CategoriasDTO>>(categorias);

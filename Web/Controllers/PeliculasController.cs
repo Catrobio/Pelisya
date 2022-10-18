@@ -1,5 +1,4 @@
-﻿using Microsoft.AspNetCore.Http;
-using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Mvc;
 using Web.Models;
 using Web.Helpers;
 
@@ -23,7 +22,10 @@ namespace Web.Controllers
             {
                 return RedirectToAction("Login", "UserAccount");
             }
-
+            //Agregamos el rol
+            ViewData["Rol"] = _session.GetSession("Rol");
+            //Agregamos el Nombre
+            ViewData["Nombre"] = _session.GetSession("Nombre");
             var listaPeliculas = new List<PeliculasModel>();
             listaPeliculas = await _actions.
                     SendAsyncRequets<List<PeliculasModel>>(
@@ -63,6 +65,10 @@ namespace Web.Controllers
         // GET: PeliculasController/Create
         public ActionResult Create()
         {
+            //Agregamos el rol
+            ViewData["Rol"] = _session.GetSession("Rol");
+            //Agregamos el Nombre
+            ViewData["Nombre"] = _session.GetSession("Nombre");
             var pelicula = new PeliculasModel();
             return View(pelicula);
         }

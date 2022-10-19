@@ -7,6 +7,8 @@ using Microsoft.IdentityModel.Tokens;
 using System.Text;
 using Microsoft.Extensions.DependencyInjection;
 using Business.PeliculasBusiness;
+using EntityLib;
+using Microsoft.EntityFrameworkCore;
 
 string CorsPolicy = "ApiCors";
 
@@ -59,7 +61,22 @@ builder.Services.AddAuthentication(config => {
         };
 });
 
+//Para code first
+/*builder.Services.AddDbContext<pelisyaContext>(op =>
+    op.UseMySql(builder.Configuration["ConnectionStringDesarrollo"], new MySqlServerVersion(new Version(8, 0, 23))
+));*/
+
+
+
 var app = builder.Build();
+
+//Para code first
+/*using (var scope = app.Services.CreateScope())
+{
+    var context = scope.ServiceProvider.GetRequiredService<pelisyaContext>();
+    context.Database.Migrate();
+}*/
+
 
 // Configure the HTTP request pipeline.
 if (app.Environment.IsDevelopment())
@@ -78,3 +95,4 @@ app.UseAuthorization();
 app.MapControllers();
 
 app.Run();
+

@@ -27,10 +27,8 @@ namespace Web.Controllers
             //Agregamos el Nombre
             ViewData["Nombre"] = _session.GetSession("Nombre");
             var listaPeliculas = new List<PeliculasModel>();
-            listaPeliculas = await _actions.
-                    SendAsyncRequets<List<PeliculasModel>>(
-                    "GET",
-                    $"{_configuration["apiUrl"]}Peliculas");
+
+            listaPeliculas = await GetPeliculasAsync();
 
             foreach (var pelicula in listaPeliculas)
             {
@@ -101,6 +99,30 @@ namespace Web.Controllers
         }
 
 
+        [HttpGet]
+        public async Task<ActionResult> buscarPelicula([FromQuery]string buscar)
+        {
+            //Agregamos el rol
+            ViewData["Rol"] = _session.GetSession("Rol");
+            //Agregamos el Nombre
+            ViewData["Nombre"] = _session.GetSession("Nombre");
+
+            var listaPeliculas = new List<PeliculasModel>();
+            listaPeliculas = await GetPeliculasAsync();
+
+            listaPeliculas = listaPeliculas.Where(p =>
+                p.Nombre.ToUpper().Contains(buscar.ToUpper()) 
+                ||
+                p.Fecha.ToString("yyyy/MM/dd").Contains(buscar)
+                ||
+                p.ActorPrincipal.ToUpper().Contains(buscar.ToUpper())
+                ).ToList();
+
+            return View("Index",listaPeliculas);
+        }
+
+       
+
         // POST: PeliculasController/Create
         [HttpPost]        
         public async Task<ActionResult> Create(PeliculasModel pelicula)
@@ -155,5 +177,14 @@ namespace Web.Controllers
                 return View();
             }
         }
+
+        private async Task<List<PeliculasModel>> GetPeliculasAsync()
+        {
+            return await _actions.
+                SendAsyncRequets<List<PeliculasModel>>(
+                "GET",
+                $"{_configuration["apiUrl"]}Peliculas");
+        }
+
     }
 }
